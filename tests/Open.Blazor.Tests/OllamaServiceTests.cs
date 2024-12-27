@@ -1,8 +1,9 @@
 ﻿using System.Net;
 using System.Text.Json;
 using FluentAssertions;
-using Open.Blazor.Core.Features.Shared;
-using Open.Blazor.Core.Features.Shared.Models;
+using Open.Blazor.Core.Constants;
+using Open.Blazor.Core.Models;
+using Open.Blazor.Core.Services;
 
 namespace Open.Blazor.Tests.OllamaServiceTests;
 
@@ -32,7 +33,7 @@ public class OllamaServiceTests
     {
         var handler = new MockHttpMessageHandler((request, cancellationToken) => Task.FromResult(_response));
         _client = new HttpClient(handler);
-        _config = new Config(Default.baseUrl);
+        _config = new Config(Default.BaseUrl);
     }
 
     [Fact]
@@ -90,7 +91,7 @@ public class OllamaServiceTests
         };
 
         var service = new OllamaService(_client, _config);
-        var customBaseUrl = Default.baseUrl;
+        var customBaseUrl = Default.BaseUrl;
 
         // Act
         var result = await service.GetListOfLocalModelsAsync(customBaseUrl);

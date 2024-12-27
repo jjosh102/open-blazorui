@@ -17,8 +17,6 @@
         <PackageReference Include="Microsoft.Extensions.AI" Version="9.0.0-preview.9.24556.5" />
         <PackageReference Include="CommunityToolkit.Aspire.OllamaSharp"  Version="9.0.0-beta.69" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
-        <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.10.4" />
-        <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.10.4" />
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.29.0" />
         <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.29.0-preview" />
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.29.0-alpha" />
@@ -37,6 +35,13 @@
 
     <ItemGroup>
         <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Features\Components\Layout\MainLayout.razor" />
+      <UpToDateCheckInput Remove="Features\Components\Layout\NavMenu.razor" />
+      <UpToDateCheckInput Remove="Features\Components\SettingsPanel.razor" />
     </ItemGroup>
 
 </Project>
