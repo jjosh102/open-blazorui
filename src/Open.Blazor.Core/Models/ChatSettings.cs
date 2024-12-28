@@ -62,8 +62,6 @@ public static class ChatSettingsExtensions
 {
     public static OpenAIPromptExecutionSettings ToOpenAIPromptExecutionSettings(this ChatSettings chatSettings)
     {
-        ArgumentNullException.ThrowIfNull(chatSettings);
-
         return new OpenAIPromptExecutionSettings
         {
             Temperature = chatSettings.Temperature,
@@ -78,8 +76,6 @@ public static class ChatSettingsExtensions
 
     public static ChatOptions ToChatOptions(this ChatSettings chatSettings)
     {
-        ArgumentNullException.ThrowIfNull(chatSettings);
-
         return new ChatOptions
         {
             Temperature = (float)chatSettings.Temperature,

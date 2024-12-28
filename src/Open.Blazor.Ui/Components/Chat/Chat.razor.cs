@@ -1,10 +1,12 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Microsoft.SemanticKernel;
 using Open.Blazor.Core.Models;
 using Open.Blazor.Core.Models.Enums;
 using Open.Blazor.Core.Services;
+using Open.Blazor.Ui.Components.Toast;
 using Toolbelt.Blazor.SpeechRecognition;
 
 namespace Open.Blazor.Ui.Components.Chat;
@@ -24,6 +26,8 @@ public partial class Chat : ComponentBase, IDisposable
     private bool _isChatOngoing;
     private bool _isListening;
     private bool _isOllamaUp;
+
+    private ToastComponent _toastComponentService;
 
     //todo support history
     private Kernel _kernel = default!;
@@ -74,7 +78,7 @@ public partial class Chat : ComponentBase, IDisposable
 
             if (!result.IsSuccess)
             {
-                ShowError("Ollama service is down. Please ensure Ollama is up and running.");
+                await ShowError("Ollama service is down. Please ensure Ollama is up and running.");
                 return;
             }
 
@@ -82,7 +86,7 @@ public partial class Chat : ComponentBase, IDisposable
 
             if (_activeOllamaModels is null || _activeOllamaModels.Models.Count == 0)
             {
-                ShowError("No models found");
+                await ShowError("No models found");
                 return;
             }
 
@@ -113,7 +117,9 @@ public partial class Chat : ComponentBase, IDisposable
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
 
             _isChatOngoing = true;
-            var modelName = OllamaHostMode == OllamaHostMode.Aspire ? _chatService.GetCurrentModel : _selectedModel.Name;
+            var modelName = OllamaHostMode == OllamaHostMode.Aspire
+                ? _chatService.GetCurrentModel
+                : _selectedModel.Name;
             _discourse.AddChatMessage(MessageRole.User, _userMessage, modelName);
             _discourse.AddChatMessage(MessageRole.Assistant, string.Empty, modelName);
             _userMessage = string.Empty;
@@ -163,9 +169,14 @@ public partial class Chat : ComponentBase, IDisposable
         }
     }
 
-    private void ShowError(string errorMessage)
+    private async Task ShowError(string errorMessage)
     {
-      //  _toastService.ShowError(errorMessage);
+        await  _toastComponentService.ShowToastAsync(
+            message: errorMessage,
+            type: ToastType.Error,
+            title: "Error",
+            durationMs: 3000
+        );
     }
 
 
@@ -202,40 +213,49 @@ public partial class Chat : ComponentBase, IDisposable
     }
 
 
-    private bool EnsureDeviceIsAvailable()
+    private async ValueTask<bool> EnsureDeviceIsAvailable()
     {
-        if (!_isSpeechAvailable)
-        {
-            ShowError("Device not available");
-            return false;
-        }
+        if (_isSpeechAvailable) return true;
+        await ShowError("Device not available");
+        return false;
 
-        return true;
     }
 
     private async Task StartListening()
     {
-        if (!EnsureDeviceIsAvailable())
+        var isDeviceAvailable = await EnsureDeviceIsAvailable();
+        if (!isDeviceAvailable)
             return;
 
         if (!_isListening)
         {
             _isListening = true;
             await _speechRecognition.StartAsync();
-           // _toastService.ShowSuccess("Listening");
+            await _toastComponentService.ShowToastAsync(
+                message: "Listening...",
+                type: ToastType.Success,
+                title: "",
+                durationMs: 3000
+            );
         }
     }
 
     private async Task StopListening()
     {
-        if (!EnsureDeviceIsAvailable())
+        var isDeviceAvailable = await EnsureDeviceIsAvailable();
+        if (!isDeviceAvailable)
             return;
 
         if (_isListening)
         {
             _isListening = false;
             await _speechRecognition.StopAsync();
-           // _toastService.ShowWarning("Stopped Listening");
+            await _toastComponentService.ShowToastAsync(
+                message: "Stopped listening...",
+                type: ToastType.Info,
+                title: "",
+                durationMs: 3000
+            );
         }
     }
 }

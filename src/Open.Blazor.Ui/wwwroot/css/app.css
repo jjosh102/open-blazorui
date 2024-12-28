@@ -108,3 +108,29 @@ h1:focus {
 .blazor-error-boundary::after {
     content: "An error has occurred."
 }
+
+
+* {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #6e7681 #15161a; 
+}
+
+
+*::-webkit-scrollbar {
+    width: 8px; 
+    height: 8px; 
+}
+
+*::-webkit-scrollbar-track {
+    background: #15161a; 
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #6e7681; 
+    border-radius: 4px; 
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #8b949e; 
+}

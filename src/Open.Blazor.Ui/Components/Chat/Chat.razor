@@ -1,5 +1,4 @@
-﻿@using Open.Blazor.Core.Models.Enums
-
+﻿<ToastComponent @ref="_toastComponentService"/>
 @if (OllamaHostMode == OllamaHostMode.Local && _activeOllamaModels is not null)
 {
     <div class="p-6 bg-gray-800 text-white rounded-md shadow-md">
@@ -45,56 +44,89 @@
     </div>
 }
 
-<div id="chat-window" class="overflow-auto h-[calc(100vh-10rem)] mb-4">
+<div id="chat-window"
+     class="overflow-auto mb-2">
     @foreach (var message in _discourse.ChatMessages)
     {
-        <ChatContent Message="message" JsRuntime="_jsRuntime"/>
+        <ChatContent Message="message" JsRuntime="_jsRuntime" Toast="_toastComponentService"/>
     }
 </div>
 
-<div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-[#0d1117] p-4 flex items-center space-x-4 max-w-3xl w-full border-none">
-    @if (!_isListening)
-    {
-        <button id="speech-button" class="p-2 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700"
-                @onclick="StartListening">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M14 10c0 1.38-.56 2.63-1.46 3.54C11.64 14.77 10.37 15 9 15s-2.64-.23-3.54-.46C4.56 12.63 4 11.38 4 10c0-.74.2-1.43.56-2.03C5.56 7.23 6.79 7 8 7s2.44.23 3.44.97C13.8 8.57 14 9.26 14 10zM9 1c2.21 0 4 1.79 4 4v6a4 4 0 1 1-8 0V5c0-2.21 1.79-4 4-4z"/>
-            </svg>
+<div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-[#0d1117] p-4 flex items-center gap-3 max-w-3xl w-full">
+    <div class="flex items-center gap-3 w-full">
+        <button
+            id="speech-button"
+            class="@(!_isListening ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0"
+            @onclick="@(_isListening ? StopListening : StartListening)">
+            @if (!_isListening)
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z
+                             M8 18.5v1a4 4 0 0 0 8 0v-1
+                             M12 3.5v2
+                             M8 6.5s1.5 2 4 2 4-2 4-2"/>
+                </svg>
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z
+                             M8 18.5v1a4 4 0 0 0 8 0v-1
+                             M4 10.5h16"/>
+                </svg>
+            }
         </button>
-    }
-    else
-    {
-        <button id="speech-button" class="p-2 bg-red-800 border border-red-700 rounded-full hover:bg-red-700"
-                @onclick="StopListening">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 3a3 3 0 0 1 3 3v6a3 3 0 1 1-6 0V6a3 3 0 0 1 3-3zM6 10a4 4 0 1 0 8 0V6a4 4 0 1 0-8 0v4zM3 10a7 7 0 1 1 14 0v5h-3v-5a7 7 0 1 0-14 0v5H3v-5z"/>
-            </svg>
-        </button>
-    }
 
-    <textarea class="w-full m-1 p-2 bg-gray-700 border border-gray-600 rounded-md text-white resize-none"
-              placeholder="Let's chat"
-              @bind="_userMessage"
-              style="min-height: 2.5rem; max-height: 10rem;">
-    </textarea>
+        <div class="relative flex-grow">
+            <textarea
+                id="chat-input"
+                class="w-full py-2.5 px-3 bg-gray-800 border border-gray-700 rounded-xl text-white resize-none focus:outline-none focus:border-blue-400 transition-colors duration-200"
+                placeholder="Let's chat..."
+                rows="1"
+                @bind="_userMessage"
+                style="min-height: 42px; max-height: 200px; height: auto; overflow-y: hidden;"
+                oninput="adjustChatWindowHeightAndScroll()">
+             </textarea>
+        </div>
 
-    @if (!_isChatOngoing)
-    {
-        <button class="p-2 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700" @onclick="SendMessage">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 24 24"
-                 fill="currentColor">
-                <path
-                    d="M2.01 21l20.63-8.69a1.003 1.003 0 0 0 .01-1.86L2.01 1.99c-.72-.3-1.48.45-1.18 1.18L3.69 11H11a1 1 0 0 1 0 2H3.69l-2.86 7.83c-.3.73.46 1.48 1.18 1.18z"/>
-            </svg>
+        <button
+            class="@(!_isChatOngoing ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0"
+            @onclick="@(_isChatOngoing ? StopChat : SendMessage)">
+            @if (!_isChatOngoing)
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M6 6h12v12H6z"/>
+                </svg>
+            }
         </button>
-    }
-    else
-    {
-        <button class="p-2 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700" @onclick="StopChat">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 24 24"
-                 fill="currentColor">
-                <path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-            </svg>
-        </button>
-    }
+    </div>
 </div>
+
+<script>
+    function adjustChatWindowHeightAndScroll() {
+        const chatInput = document.getElementById('chat-input');
+        const chatWindow = document.getElementById('chat-window');
+        
+        chatInput.style.height = 'auto'; 
+        const newInputHeight = Math.min(chatInput.scrollHeight, 200);
+        chatInput.style.height = `${newInputHeight}px`;
+        
+        chatWindow.style.height = `calc(100vh - 5rem - ${newInputHeight}px)`;
+        
+        chatInput.style.overflowY = newInputHeight >= 200 ? 'auto' : 'hidden';
+    }
+</script>

@@ -8,7 +8,7 @@ namespace Open.Blazor.Core.Models;
 /// </summary>
 public class Ollama
 {
-    [JsonPropertyName("models")] public IReadOnlyList<OllamaModel> Models { get; set; } = [];
+    [JsonPropertyName("models")] public IReadOnlyList<OllamaModel> Models { get; set; }  = new List<OllamaModel>();
 }
 
 [DebuggerDisplay("{Name}")]

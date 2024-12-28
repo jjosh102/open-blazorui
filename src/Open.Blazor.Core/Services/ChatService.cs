@@ -14,14 +14,12 @@ public sealed class ChatService
 
     public ChatService(Config config, IChatClient client)
     {
-        _config = config;
-        _client = client;
+        _config = config ?? throw new ArgumentNullException(nameof(config));
+        _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
     public Kernel CreateKernel(string model)
     {
-        ArgumentNullException.ThrowIfNull(model);
-
         var kernelBuilder = Kernel.CreateBuilder()
             .AddOllamaChatCompletion(
                 model,
@@ -37,10 +35,6 @@ public sealed class ChatService
         ChatSettings chatSettings,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(kernel);
-        ArgumentNullException.ThrowIfNull(discourse);
-        ArgumentNullException.ThrowIfNull(onStreamCompletion);
-        ArgumentNullException.ThrowIfNull(chatSettings);
 
         var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
 
@@ -61,9 +55,6 @@ public sealed class ChatService
         Func<string, Task> onStreamCompletion,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(discourse);
-        ArgumentNullException.ThrowIfNull(onStreamCompletion);
-      
         var history = discourse.ToChatMessages();
         await foreach (var completionResult in _client.CompleteStreamingAsync(history, null, cancellationToken))
         {
@@ -75,7 +66,7 @@ public sealed class ChatService
     public string GetCurrentModel => _client.Metadata.ModelId ?? "No Model Found";
 }
 
-public static class ChatServiceExensions
+public static class ChatServiceExtensions
 {
     public static IServiceCollection AddChatServiceAsScoped(this IServiceCollection services)
     {
