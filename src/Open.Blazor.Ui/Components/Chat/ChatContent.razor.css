@@ -1,4 +1,4 @@
-﻿::deep .markdown-content {
+﻿.markdown-content {
     padding: 10px;
     border: 1px solid #444;
     border-radius: 5px;
@@ -6,7 +6,7 @@
     color: #dcdcdc;
 }
 
-::deep pre {
+pre {
     background-color: #0D0D0D;
     padding: 10px;
     border-radius: 5px;
@@ -15,7 +15,7 @@
     max-width: 700px;
 }
 
-::deep code {
+code {
     background-color: #0D0D0D;
     padding: 2px 4px;
     border-radius: 3px;
@@ -23,20 +23,20 @@
     max-width: 700px;
 }
 
-::deep strong {
+strong {
     color: #ffffff;
 }
 
-::deep a {
+a {
     color: #66d9ef;
     text-decoration: none;
 }
 
-::deep a:hover {
+a:hover {
     text-decoration: underline;
 }
 
-::deep blockquote {
+blockquote {
     color: #888;
     border-left: 3px solid #444;
     padding-left: 10px;
@@ -44,20 +44,20 @@
     margin-right: 0;
 }
 
-::deep ul, ol {
+ul, ol {
     padding-left: 20px;
 }
 
-::deep li {
+li {
     margin-bottom: 5px;
 }
 
-::deep .card-container {
+.card-container {
     display: flex;
     justify-content: flex-end;
 }
 
-::deep .card {
+.card {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 10px;

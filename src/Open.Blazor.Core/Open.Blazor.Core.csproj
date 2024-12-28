@@ -7,8 +7,7 @@
         <NoWarn>SKEXP0010</NoWarn>
         <NoWarn>SKEXP0070</NoWarn>
     </PropertyGroup>
-
-
+    
     <ItemGroup>
         <SupportedPlatform Include="browser" />
     </ItemGroup>
@@ -26,22 +25,9 @@
 
     </ItemGroup>
 
-
     <ItemGroup>
         <InternalsVisibleTo Include="Open.Blazor.Tests" />
 
     </ItemGroup>
-
-
-    <ItemGroup>
-        <Folder Include="wwwroot\" />
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <UpToDateCheckInput Remove="Features\Components\Layout\MainLayout.razor" />
-      <UpToDateCheckInput Remove="Features\Components\Layout\NavMenu.razor" />
-      <UpToDateCheckInput Remove="Features\Components\SettingsPanel.razor" />
-    </ItemGroup>
-
+    
 </Project>

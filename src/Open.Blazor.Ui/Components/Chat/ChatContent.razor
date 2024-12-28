@@ -4,7 +4,7 @@
 
 @if (Message is not null)
 {
-    <div class="chat-content flex flex-col @(_alignment == "left" ? "items-start" : "items-end")">
+    <div class="chat-content flex flex-col @(_alignment == "left" ? "items-start" : "items-end") ">
         @if (Message.Role == MessageRole.User)
         {
             <div class="card-container bg-blue-500 text-white p-4 rounded-lg max-w-md shadow-lg">
@@ -29,7 +29,8 @@
             }
             else
             {
-                <div class="markdown-container prose prose-sm text-gray-300">
+                // todo: fix overlapping width
+                <div class="prose prose-sm text-gray-300 max-w-3xl w-full mx-auto break-words">
                     @((MarkupString)Markdown.ToHtml(Message.Content ?? string.Empty))
                 </div>
             }
@@ -39,8 +40,10 @@
                 <div class="copy-container mt-2">
                     <button id="copy-content-button" @onclick="CopyToClipboard"
                             class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M16 1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 14H4V3h12v12zM20 5h-2v2h2v12H8v-2H6v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-6 4H6v2h8V9z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300" fill="currentColor"
+                             viewBox="0 0 24 24">
+                            <path
+                                d="M16 1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 14H4V3h12v12zM20 5h-2v2h2v12H8v-2H6v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-6 4H6v2h8V9z"/>
                         </svg>
                     </button>
                     <div class="tooltip bg-gray-800 text-white p-2 rounded-md shadow-lg text-sm mt-1">
@@ -56,7 +59,7 @@
     [Parameter] public MessageContent? Message { get; set; }
 
     [Parameter] public IJSRuntime? JsRuntime { get; set; }
-    
+
 
     private string _alignment = string.Empty;
 
@@ -73,4 +76,5 @@
         // else
         //    // ToastService!.ShowError("Clipboard's empty");
     }
+
 }

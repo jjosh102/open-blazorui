@@ -1,0 +1,100 @@
+﻿@using Open.Blazor.Core.Models.Enums
+
+@if (OllamaHostMode == OllamaHostMode.Local && _activeOllamaModels is not null)
+{
+    <div class="p-6 bg-gray-800 text-white rounded-md shadow-md">
+        <div class="text-xl font-bold mb-4">Chat Settings</div>
+        <hr class="my-4 border-gray-600"/>
+
+        <div class="mb-4">
+            <label for="listOfActiveModels" class="block text-sm font-medium text-gray-300">Model</label>
+            <select id="listOfActiveModels"
+                    class="block w-52 p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+                    @bind="_selectedModel">
+                @foreach (var model in _activeOllamaModels.Models)
+                {
+                    <option value="@model">@model.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label for="temp-control" class="block text-sm font-medium text-gray-300">Temperature: @_temperature</label>
+            <input id="temp-control" type="range" min="0" max="2" step="0.1"
+                   class="w-full h-2 bg-gray-600 rounded-lg cursor-pointer accent-blue-500" @bind="_temperature"/>
+            <p class="text-xs text-gray-400 mt-1">Think of it as a measure of creativity. Lower values are more
+                predictable, higher values are more diverse.</p>
+        </div>
+
+        <div class="mb-4">
+            <label for="max-token-control" class="block text-sm font-medium text-gray-300">Max
+                Tokens: @_maxTokens</label>
+            <input id="max-token-control" type="range" min="0" max="4000" step="10"
+                   class="w-full h-2 bg-gray-600 rounded-lg cursor-pointer accent-blue-500" @bind="_maxTokens"/>
+            <p class="text-xs text-gray-400 mt-1">Limits the response length by setting the maximum number of words or
+                tokens.</p>
+        </div>
+
+        <div class="mb-4">
+            <label for="system-prompt-control" class="block text-sm font-medium text-gray-300">System Prompt</label>
+            <textarea id="system-prompt-control" rows="4"
+                      class="block w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+                      @bind="_chatSystemPrompt"></textarea>
+            <p class="text-xs text-gray-400 mt-1">Personalizes responses based on identity or preferences.</p>
+        </div>
+    </div>
+}
+
+<div id="chat-window" class="overflow-auto h-[calc(100vh-10rem)] mb-4">
+    @foreach (var message in _discourse.ChatMessages)
+    {
+        <ChatContent Message="message" JsRuntime="_jsRuntime"/>
+    }
+</div>
+
+<div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-[#0d1117] p-4 flex items-center space-x-4 max-w-3xl w-full border-none">
+    @if (!_isListening)
+    {
+        <button id="speech-button" class="p-2 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700"
+                @onclick="StartListening">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M14 10c0 1.38-.56 2.63-1.46 3.54C11.64 14.77 10.37 15 9 15s-2.64-.23-3.54-.46C4.56 12.63 4 11.38 4 10c0-.74.2-1.43.56-2.03C5.56 7.23 6.79 7 8 7s2.44.23 3.44.97C13.8 8.57 14 9.26 14 10zM9 1c2.21 0 4 1.79 4 4v6a4 4 0 1 1-8 0V5c0-2.21 1.79-4 4-4z"/>
+            </svg>
+        </button>
+    }
+    else
+    {
+        <button id="speech-button" class="p-2 bg-red-800 border border-red-700 rounded-full hover:bg-red-700"
+                @onclick="StopListening">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 3a3 3 0 0 1 3 3v6a3 3 0 1 1-6 0V6a3 3 0 0 1 3-3zM6 10a4 4 0 1 0 8 0V6a4 4 0 1 0-8 0v4zM3 10a7 7 0 1 1 14 0v5h-3v-5a7 7 0 1 0-14 0v5H3v-5z"/>
+            </svg>
+        </button>
+    }
+
+    <textarea class="w-full m-1 p-2 bg-gray-700 border border-gray-600 rounded-md text-white resize-none"
+              placeholder="Let's chat"
+              @bind="_userMessage"
+              style="min-height: 2.5rem; max-height: 10rem;">
+    </textarea>
+
+    @if (!_isChatOngoing)
+    {
+        <button class="p-2 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700" @onclick="SendMessage">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 24 24"
+                 fill="currentColor">
+                <path
+                    d="M2.01 21l20.63-8.69a1.003 1.003 0 0 0 .01-1.86L2.01 1.99c-.72-.3-1.48.45-1.18 1.18L3.69 11H11a1 1 0 0 1 0 2H3.69l-2.86 7.83c-.3.73.46 1.48 1.18 1.18z"/>
+            </svg>
+        </button>
+    }
+    else
+    {
+        <button class="p-2 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700" @onclick="StopChat">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 24 24"
+                 fill="currentColor">
+                <path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+            </svg>
+        </button>
+    }
+</div>

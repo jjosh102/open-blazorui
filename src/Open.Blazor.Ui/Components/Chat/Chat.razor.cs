@@ -7,7 +7,7 @@ using Open.Blazor.Core.Models.Enums;
 using Open.Blazor.Core.Services;
 using Toolbelt.Blazor.SpeechRecognition;
 
-namespace Open.Blazor.Core.Components.Chat;
+namespace Open.Blazor.Ui.Components.Chat;
 
 public partial class Chat : ComponentBase, IDisposable
 {
@@ -109,6 +109,7 @@ public partial class Chat : ComponentBase, IDisposable
     {
         try
         {
+            Console.WriteLine($"Sending message: {_userMessage}");
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
 
             _isChatOngoing = true;

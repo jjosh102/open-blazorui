@@ -20,5 +20,10 @@
         <ProjectReference Include="..\Open.Blazor.Core\Open.Blazor.Core.csproj"/>
         <ProjectReference Include="..\Open.Blazor.ServiceDefaults\Open.Blazor.ServiceDefaults.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Chat\Chat.razor" />
+      <AdditionalFiles Include="Components\Chat\ChatContent.razor" />
+    </ItemGroup>
 
 </Project>
