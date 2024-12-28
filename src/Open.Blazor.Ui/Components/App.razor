@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <base href="/"/>
+    <link rel="stylesheet" href="@Assets["css/app.out.css"]" />
+    <link rel="stylesheet" href="@Assets["Open.Blazor.Ui.styles.css"]" />
+    <ImportMap />
+    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+    <HeadOutlet/>
+</head>
+
+<body>
+<Routes @rendermode="new InteractiveServerRenderMode(false)"/>
+<script src="js/utilities.js"></script>
+<script src="_framework/blazor.web.js"></script>
+</body>
+
+</html>

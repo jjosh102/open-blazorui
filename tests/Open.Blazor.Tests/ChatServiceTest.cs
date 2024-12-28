@@ -1,5 +1,6 @@
-using Open.Blazor.Core.Features.Chat;
-using Open.Blazor.Core.Features.Shared;
+using Open.Blazor.Core.Constants;
+using Open.Blazor.Core.Models;
+using Open.Blazor.Core.Services;
 
 namespace Open.Blazor.Tests.ChatServiceTests;
 
@@ -10,7 +11,7 @@ public class ChatServiceTests
 
     public ChatServiceTests()
     {
-        _config = new Config(Default.baseUrl); // Provide a default URL or mock config
+        _config = new Config(Default.BaseUrl); // Provide a default URL or mock config
     }
 
     [Fact]

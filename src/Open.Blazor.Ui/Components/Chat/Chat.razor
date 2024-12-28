@@ -1,0 +1,132 @@
+﻿<ToastComponent @ref="_toastComponentService"/>
+@if (OllamaHostMode == OllamaHostMode.Local && _activeOllamaModels is not null)
+{
+    <div class="p-6 bg-gray-800 text-white rounded-md shadow-md">
+        <div class="text-xl font-bold mb-4">Chat Settings</div>
+        <hr class="my-4 border-gray-600"/>
+
+        <div class="mb-4">
+            <label for="listOfActiveModels" class="block text-sm font-medium text-gray-300">Model</label>
+            <select id="listOfActiveModels"
+                    class="block w-52 p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+                    @bind="_selectedModel">
+                @foreach (var model in _activeOllamaModels.Models)
+                {
+                    <option value="@model">@model.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label for="temp-control" class="block text-sm font-medium text-gray-300">Temperature: @_temperature</label>
+            <input id="temp-control" type="range" min="0" max="2" step="0.1"
+                   class="w-full h-2 bg-gray-600 rounded-lg cursor-pointer accent-blue-500" @bind="_temperature"/>
+            <p class="text-xs text-gray-400 mt-1">Think of it as a measure of creativity. Lower values are more
+                predictable, higher values are more diverse.</p>
+        </div>
+
+        <div class="mb-4">
+            <label for="max-token-control" class="block text-sm font-medium text-gray-300">Max
+                Tokens: @_maxTokens</label>
+            <input id="max-token-control" type="range" min="0" max="4000" step="10"
+                   class="w-full h-2 bg-gray-600 rounded-lg cursor-pointer accent-blue-500" @bind="_maxTokens"/>
+            <p class="text-xs text-gray-400 mt-1">Limits the response length by setting the maximum number of words or
+                tokens.</p>
+        </div>
+
+        <div class="mb-4">
+            <label for="system-prompt-control" class="block text-sm font-medium text-gray-300">System Prompt</label>
+            <textarea id="system-prompt-control" rows="4"
+                      class="block w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+                      @bind="_chatSystemPrompt"></textarea>
+            <p class="text-xs text-gray-400 mt-1">Personalizes responses based on identity or preferences.</p>
+        </div>
+    </div>
+}
+
+<div id="chat-window"
+     class="overflow-auto mb-2">
+    @foreach (var message in _discourse.ChatMessages)
+    {
+        <ChatContent Message="message" JsRuntime="_jsRuntime" Toast="_toastComponentService"/>
+    }
+</div>
+
+<div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-[#0d1117] p-4 flex items-center gap-3 max-w-3xl w-full">
+    <div class="flex items-center gap-3 w-full">
+        <button
+            id="speech-button"
+            class="@(!_isListening ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0"
+            @onclick="@(_isListening ? StopListening : StartListening)">
+            @if (!_isListening)
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z
+                             M8 18.5v1a4 4 0 0 0 8 0v-1
+                             M12 3.5v2
+                             M8 6.5s1.5 2 4 2 4-2 4-2"/>
+                </svg>
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z
+                             M8 18.5v1a4 4 0 0 0 8 0v-1
+                             M4 10.5h16"/>
+                </svg>
+            }
+        </button>
+
+        <div class="relative flex-grow">
+            <textarea
+                id="chat-input"
+                class="w-full py-2.5 px-3 bg-gray-800 border border-gray-700 rounded-xl text-white resize-none focus:outline-none focus:border-blue-400 transition-colors duration-200"
+                placeholder="Let's chat..."
+                rows="1"
+                @bind="_userMessage"
+                style="min-height: 42px; max-height: 200px; height: auto; overflow-y: hidden;"
+                oninput="adjustChatWindowHeightAndScroll()">
+             </textarea>
+        </div>
+
+        <button
+            class="@(!_isChatOngoing ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0"
+            @onclick="@(_isChatOngoing ? StopChat : SendMessage)">
+            @if (!_isChatOngoing)
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M6 6h12v12H6z"/>
+                </svg>
+            }
+        </button>
+    </div>
+</div>
+
+<script>
+    function adjustChatWindowHeightAndScroll() {
+        const chatInput = document.getElementById('chat-input');
+        const chatWindow = document.getElementById('chat-window');
+        
+        chatInput.style.height = 'auto'; 
+        const newInputHeight = Math.min(chatInput.scrollHeight, 200);
+        chatInput.style.height = `${newInputHeight}px`;
+        
+        chatWindow.style.height = `calc(100vh - 5rem - ${newInputHeight}px)`;
+        
+        chatInput.style.overflowY = newInputHeight >= 200 ? 'auto' : 'hidden';
+    }
+</script>

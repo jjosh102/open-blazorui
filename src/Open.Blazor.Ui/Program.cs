@@ -1,5 +1,6 @@
-using Open.Blazor.Core.Features.Shared;
-using Open.Blazor.Ui;
+
+using Open.Blazor.Core.Extensions;
+using Open.Blazor.Ui.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,9 +23,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
-
 app.UseAntiforgery();
+
+app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

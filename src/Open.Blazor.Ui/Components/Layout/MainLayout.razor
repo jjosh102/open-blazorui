@@ -1,0 +1,36 @@
+﻿
+@inherits LayoutComponentBase
+
+<div class="min-h-screen flex flex-col">
+    <header class="bg-[#0d1117] py-4">
+    </header>
+    <main class="flex-grow bg-[#0d1117]">
+        <div class="max-w-3xl mx-auto p-4">
+            <ErrorBoundary>
+                <ChildContent>
+                    <CascadingValue Value="_hostMode">
+                        @Body
+                    </CascadingValue>
+                </ChildContent>
+                <ErrorContent Context="Exception">
+                    <div class="bg-[#161b22] border border-[#f85149] text-[#f85149] px-4 py-3 rounded">
+                        <span class="font-bold">Error Type:</span> @Exception.GetType() <br/>
+                        <span class="font-bold">Message:</span> @Exception.Message
+                    </div>
+                    <p class="text-center text-[#8b949e] mt-4">Nothing to see here right now. Sorry!</p>
+                </ErrorContent>
+            </ErrorBoundary>
+        </div>
+    </main>
+
+    @* <footer class="bg-[#0d1117]"> *@
+    @*     *@
+    @* </footer> *@
+</div>
+
+@code
+{
+    //todo: get  OllamaHostMode.Lcocal working
+    OllamaHostMode _hostMode = OllamaHostMode.Aspire;
+
+}

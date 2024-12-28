@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Blazor.Ui", "src\Open.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Blazor.Tests", "tests\Open.Blazor.Tests\Open.Blazor.Tests.csproj", "{83C327DE-D822-4596-B99F-352601F7FA5D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Blazor.Ui.WebAssembly", "src\Open.Blazor.Ui.WebAssembly\Open.Blazor.Ui.WebAssembly.csproj", "{6AA45FEE-8D16-4378-ACB3-615D6D9E00FD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Blazor.Core", "src\Open.Blazor.Core\Open.Blazor.Core.csproj", "{122E1625-4C6B-4776-A72E-54B1595273D6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Open.Blazor.ServiceDefaults", "src\Open.Blazor.ServiceDefaults\Open.Blazor.ServiceDefaults.csproj", "{7F6638B7-AFF4-408E-94A3-09DCF6C914C9}"
@@ -29,10 +27,6 @@ Global
 		{83C327DE-D822-4596-B99F-352601F7FA5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83C327DE-D822-4596-B99F-352601F7FA5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83C327DE-D822-4596-B99F-352601F7FA5D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6AA45FEE-8D16-4378-ACB3-615D6D9E00FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6AA45FEE-8D16-4378-ACB3-615D6D9E00FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6AA45FEE-8D16-4378-ACB3-615D6D9E00FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6AA45FEE-8D16-4378-ACB3-615D6D9E00FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{122E1625-4C6B-4776-A72E-54B1595273D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{122E1625-4C6B-4776-A72E-54B1595273D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{122E1625-4C6B-4776-A72E-54B1595273D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
