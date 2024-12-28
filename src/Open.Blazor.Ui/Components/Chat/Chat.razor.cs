@@ -27,7 +27,7 @@ public partial class Chat : ComponentBase, IDisposable
     private bool _isListening;
     private bool _isOllamaUp;
 
-    private ToastComponent _toastComponentService;
+    private ToastComponent? _toastComponentService;
 
     //todo support history
     private Kernel _kernel = default!;
@@ -59,11 +59,7 @@ public partial class Chat : ComponentBase, IDisposable
         _speechRecognition = speechRecognition;
     }
 
-    public void Dispose()
-    {
-        _cancellationTokenSource?.Dispose();
-        _speechRecognition.Result -= OnSpeechRecognized!;
-    }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -171,7 +167,7 @@ public partial class Chat : ComponentBase, IDisposable
 
     private async Task ShowError(string errorMessage)
     {
-        await  _toastComponentService.ShowToastAsync(
+        await _toastComponentService!.ShowToastAsync(
             message: errorMessage,
             type: ToastType.Error,
             title: "Error",
@@ -231,7 +227,7 @@ public partial class Chat : ComponentBase, IDisposable
         {
             _isListening = true;
             await _speechRecognition.StartAsync();
-            await _toastComponentService.ShowToastAsync(
+            await _toastComponentService!.ShowToastAsync(
                 message: "Listening...",
                 type: ToastType.Success,
                 title: "",
@@ -250,12 +246,18 @@ public partial class Chat : ComponentBase, IDisposable
         {
             _isListening = false;
             await _speechRecognition.StopAsync();
-            await _toastComponentService.ShowToastAsync(
+            await _toastComponentService!.ShowToastAsync(
                 message: "Stopped listening...",
                 type: ToastType.Info,
                 title: "",
                 durationMs: 3000
             );
         }
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Dispose();
+        _speechRecognition.Result -= OnSpeechRecognized!;
     }
 }
