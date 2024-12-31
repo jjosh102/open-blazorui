@@ -2,8 +2,7 @@
 
 @if (Message is not null)
 {
-    <div
-        class="w-full max-w-[700px] min-w-[400px] mx-auto p-5 box-border flex flex-col @(Message.Role == MessageRole.Assistant ? "items-start" : "items-end")">
+    <div class="w-full max-w-[700px] min-w-[400px] mx-auto p-5 box-border flex flex-col @(Message.Role == MessageRole.Assistant ? "items-start" : "items-end")">
         @if (Message.Role == MessageRole.User)
         {
             <div class="flex justify-end">
@@ -37,7 +36,7 @@
             {
                 <div class="prose prose-sm text-gray-300 max-w-3xl w-full mx-auto">
                     <div class="p-4 border border-neutral-600 rounded-lg bg-[#0d1117] relative"
-                         style="padding-top: 3rem;">
+                         style="padding-bottom: 3rem;">
                         <div class="overflow-x-auto w-full">
                             <div class="[&>*]:break-words [&>*]:overflow-x-auto
                                         [&>pre]:bg-neutral-900 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:text-neutral-100 [&>pre]:whitespace-pre-wrap
@@ -51,23 +50,23 @@
                         </div>
                         @if (Message.IsDoneStreaming)
                         {
-                            <div class="absolute top-2 right-2 group">
-                                <button @onclick="CopyToClipboard"
-                                        class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md transition-colors duration-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300"
-                                         fill="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path
-                                            d="M16 1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 14H4V3h12v12zM20 5h-2v2h2v12H8v-2H6v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-6 4H6v2h8V9z"/>
-                                    </svg>
-                                </button>
-                                <div class="absolute top-full right-0 mt-1 hidden group-hover:block">
-                                    <div
-                                        class="bg-gray-800 text-white px-3 py-1 rounded-md shadow-lg text-sm whitespace-nowrap">
-                                        Copy contents
-                                    </div>
+                        <div class="absolute bottom-2 right-2 group">
+                            <button @onclick="CopyToClipboard"
+                                    class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md transition-colors duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M16 1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 14H4V3h12v12zM20 5h-2v2h2v12H8v-2H6v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-6 4H6v2h8V9z"/>
+                                </svg>
+                            </button>
+                            <div class="absolute bottom-full right-1/2 transform translate-x-1/2 mb-1 hidden group-hover:block">
+                                <div
+                                    class="bg-gray-800 text-white px-3 py-1 rounded-md shadow-lg text-sm whitespace-nowrap">
+                                    Copy contents
                                 </div>
                             </div>
+                        </div>
                         }
                     </div>
                 </div>
