@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
 using Open.Blazor.Core.Models;
 
 namespace Open.Blazor.Core.Services;
@@ -47,12 +46,3 @@ public sealed class OllamaService
     }
 }
 
-public static class OllamaServiceExensions
-{
-    public static IServiceCollection AddOllamaServiceAsScoped(this IServiceCollection services)
-    {
-        ArgumentNullException.ThrowIfNull(services);
-        services.AddHttpClient<OllamaService>();
-        return services;
-    }
-}

@@ -2,7 +2,8 @@
 
 @if (Message is not null)
 {
-    <div class="w-full max-w-[700px] min-w-[400px] mx-auto p-5 box-border flex flex-col @(Message.Role == MessageRole.Assistant ? "items-start" : "items-end")">
+    <div
+        class="w-full max-w-[700px] min-w-[400px] mx-auto p-5 box-border flex flex-col @(Message.Role == MessageRole.Assistant ? "items-start" : "items-end")">
         @if (Message.Role == MessageRole.User)
         {
             <div class="flex justify-end">
@@ -14,7 +15,7 @@
         else
         {
             <div class="flex items-center space-x-4 mb-2">
-                <div class="flex items-center justify-center w-10 h-10 bg-gray-700 rounded-full text-white font-bold">
+                <div class="flex items-center justify-center w-10 h-10 @(Host == OllamaHostMode.Local ? "bg-gray-700" : "bg-[#6E50D5]") rounded-full text-white font-bold">
                     @Message.Model.Substring(0, 1)
                 </div>
                 <div class="text-gray-400 text-sm">
@@ -35,8 +36,7 @@
             else
             {
                 <div class="prose prose-sm text-gray-300 max-w-3xl w-full mx-auto">
-                    <div class="p-4 border border-neutral-600 rounded-lg bg-[#0d1117] relative"
-                         style="padding-bottom: 3rem;">
+                    <div class="p-4 border @(Host == OllamaHostMode.Local ? "border-neutral-600" : "border-violet-600")  rounded-lg bg-[#0d1117] relative" style="padding-bottom: 3rem;">
                         <div class="overflow-x-auto w-full">
                             <div class="[&>*]:break-words [&>*]:overflow-x-auto
                                         [&>pre]:bg-neutral-900 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:text-neutral-100 [&>pre]:whitespace-pre-wrap
@@ -50,23 +50,21 @@
                         </div>
                         @if (Message.IsDoneStreaming)
                         {
-                        <div class="absolute bottom-2 right-2 group">
-                            <button @onclick="CopyToClipboard"
+                            <div class="absolute bottom-2 right-2 group">
+                                <button @onclick="CopyToClipboard"
                                     class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md transition-colors duration-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path
-                                        d="M16 1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 14H4V3h12v12zM20 5h-2v2h2v12H8v-2H6v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-6 4H6v2h8V9z"/>
-                                </svg>
-                            </button>
-                            <div class="absolute bottom-full right-1/2 transform translate-x-1/2 mb-1 hidden group-hover:block">
-                                <div
-                                    class="bg-gray-800 text-white px-3 py-1 rounded-md shadow-lg text-sm whitespace-nowrap">
-                                    Copy contents
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300" fill="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M16 1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 14H4V3h12v12zM20 5h-2v2h2v12H8v-2H6v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-6 4H6v2h8V9z" />
+                                    </svg>
+                                </button>
+                                <div class="absolute bottom-full right-1/2 transform translate-x-1/2 mb-1 hidden group-hover:block">
+                                    <div class="bg-gray-800 text-white px-3 py-1 rounded-md shadow-lg text-sm whitespace-nowrap">
+                                        Copy contents
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         }
                     </div>
                 </div>
@@ -79,26 +77,27 @@
     [Parameter] public MessageContent? Message { get; set; }
     [Parameter] public IJSRuntime? JsRuntime { get; set; }
     [Parameter] public ToastComponent? Toast { get; set; }
+    [Parameter] public OllamaHostMode? Host { get; set; }
 
     private async Task CopyToClipboard()
     {
         if (!string.IsNullOrEmpty(Message?.Content))
         {
             await JsRuntime!.InvokeVoidAsync("navigator.clipboard.writeText", Message.Content);
-            await  Toast!.ShowToastAsync(
-                message: "Copied to clipboard.",
-                type: ToastType.Success,
-                title: "",
-                durationMs: 3000
+            await Toast!.ShowToastAsync(
+            message: "Copied to clipboard.",
+            type: ToastType.Success,
+            title: "",
+            durationMs: 3000
             );
         }
         else
         {
-            await  Toast!.ShowToastAsync(
-                message: "Clipboard's empty",
-                type: ToastType.Error,
-                title: "",
-                durationMs: 3000
+            await Toast!.ShowToastAsync(
+            message: "Clipboard's empty",
+            type: ToastType.Error,
+            title: "",
+            durationMs: 3000
             );
         }
     }

@@ -12,7 +12,7 @@ namespace Open.Blazor.Core.Extensions;
 
 public static class DiExtensions
 {
-    public static IServiceCollection AddCoreDependencies(this IServiceCollection services)
+    public static IServiceCollection AddCoreDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(services);
         services.AddSingleton(serviceProvider =>
@@ -21,23 +21,18 @@ public static class DiExtensions
 
             return new Config(Default.BaseUrl);
         });
-        services.AddSingleton<IChatClient>(static serviceProvider =>
+
+        // Configure based on the model identified in AppHost
+        if (TryGetDbConfig(configuration, "ollama-phi3-5", out var endpoint, out var model))
         {
-            var config = serviceProvider.GetRequiredService<IConfiguration>();
-            var ollamaConnectionString = config.GetConnectionString("ollama-phi3-5");
-            var connectionBuilder = new DbConnectionStringBuilder {
-                ConnectionString = ollamaConnectionString
-            };
-            
-            var endpoint = connectionBuilder["Endpoint"].ToString() ?? string.Empty;
-            var model = connectionBuilder["Model"].ToString() ?? string.Empty;
-            Console.WriteLine($"model: {model}");
-            IChatClient chatClient = new OllamaApiClient(new Uri(endpoint),model); 
-            return chatClient;
-        });
-        
+            services.AddSingleton<IChatClient>(_ => new OllamaApiClient(new Uri(endpoint), model));
+        }else
+        {
+            services.AddSingleton<IChatClient>(_ => new OllamaApiClient(Default.BaseUrl, Default.Model));
+        }
+
         services.AddChatServiceAsScoped();
-        services.AddOllamaServiceAsScoped();
+        services.AddHttpClient<OllamaService>();
         services.AddSpeechRecognition();
         return services;
     }
@@ -51,8 +46,8 @@ public static class DiExtensions
 
             return new Config(Default.BaseUrl);
         });
-        
-        services.AddOllamaServiceAsScoped();
+
+        services.AddHttpClient<OllamaService>();
         services.AddSpeechRecognition();
         return services;
     }
@@ -61,5 +56,27 @@ public static class DiExtensions
     {
         value = Environment.GetEnvironmentVariable(variableName) ?? string.Empty;
         return !string.IsNullOrEmpty(value);
+    }
+    private static bool TryGetDbConfig(IConfiguration configuration, string connectionName, out string endpoint, out string model)
+    {
+        endpoint = string.Empty;
+        model = string.Empty;
+
+        var connectionString = configuration.GetConnectionString(connectionName);
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            return false;
+        }
+
+        var connectionBuilder = new DbConnectionStringBuilder
+        {
+            ConnectionString = connectionString
+        };
+
+        endpoint = connectionBuilder["Endpoint"]?.ToString() ?? string.Empty;
+        model = connectionBuilder["Model"]?.ToString() ?? string.Empty;
+
+
+        return !string.IsNullOrWhiteSpace(endpoint) && !string.IsNullOrWhiteSpace(model);
     }
 }

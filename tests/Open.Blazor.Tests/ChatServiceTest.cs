@@ -4,6 +4,7 @@ using Open.Blazor.Core.Services;
 
 namespace Open.Blazor.Tests.ChatServiceTests;
 
+//todo: need rework 
 public class ChatServiceTests
 {
     private const string Model = "llama3:latest";

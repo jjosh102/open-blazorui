@@ -9,7 +9,8 @@ builder.AddServiceDefaults();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddCoreDependencies();
+builder.Services.AddCoreDependencies(builder.Configuration);
+
 
 var app = builder.Build();
 

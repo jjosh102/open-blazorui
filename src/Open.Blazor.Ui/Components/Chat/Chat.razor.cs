@@ -46,6 +46,8 @@ public partial class Chat : ComponentBase, IDisposable
     private double _topP = 1;
     private string _userMessage = string.Empty;
 
+    private bool _isPanelOpen;
+
     [CascadingParameter] public OllamaHostMode OllamaHostMode { get; set; }
 
     public Chat(ChatService chatService,
@@ -80,7 +82,7 @@ public partial class Chat : ComponentBase, IDisposable
 
             _activeOllamaModels = result.Value;
 
-            if (_activeOllamaModels is null || _activeOllamaModels.Models.Count == 0)
+            if (_activeOllamaModels is null || !_activeOllamaModels.Models.Any())
             {
                 await ShowError("No models found");
                 return;
@@ -176,10 +178,18 @@ public partial class Chat : ComponentBase, IDisposable
     }
 
 
-    private void HandleSelectedOptionChanged(OllamaModel? selectedModelChanged)
+    private void HandleSelectedOptionChanged(ChangeEventArgs e)
     {
-        if (selectedModelChanged is null) return;
-        _selectedModel = selectedModelChanged;
+        var selectedName = e.Value?.ToString();
+        if (string.IsNullOrEmpty(selectedName)) return;
+
+        var selectedModel = _activeOllamaModels?.Models?.FirstOrDefault(m => m.Name == selectedName);
+        if (selectedModel != null)
+        {
+            _selectedModel = selectedModel;
+        }
+        if (_selectedModel is null) return;
+
         _kernel = _chatService.CreateKernel(_selectedModel.Name);
     }
 
@@ -253,6 +263,16 @@ public partial class Chat : ComponentBase, IDisposable
                 durationMs: 3000
             );
         }
+    }
+
+    private void TogglePanel()
+    {
+        _isPanelOpen = !_isPanelOpen;
+    }
+
+    private string GetPanelClasses()
+    {
+        return $"fixed inset-0 z-50 overflow-hidden {(_isPanelOpen ? "pointer-events-auto" : "pointer-events-none")}";
     }
 
     public void Dispose()
