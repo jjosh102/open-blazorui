@@ -48,7 +48,7 @@ public partial class Chat : ComponentBase, IDisposable
 
     private bool _isPanelOpen;
 
-    [CascadingParameter] public OllamaHostMode OllamaHostMode { get; set; }
+    [CascadingParameter] public HostMode HostMode { get; set; }
 
     public Chat(ChatService chatService,
         OllamaService ollamaService,
@@ -70,7 +70,7 @@ public partial class Chat : ComponentBase, IDisposable
         _speechRecognition.Continuous = true;
         _speechRecognition.Result += OnSpeechRecognized;
 
-        if (OllamaHostMode == OllamaHostMode.Local)
+        if (HostMode == HostMode.Local)
         {
             var result = await _ollamaService.GetListOfLocalModelsAsync();
 
@@ -114,7 +114,7 @@ public partial class Chat : ComponentBase, IDisposable
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
 
             _isChatOngoing = true;
-            var modelName = OllamaHostMode == OllamaHostMode.Aspire
+            var modelName = HostMode == HostMode.Aspire
                 ? _chatService.GetCurrentModel
                 : _selectedModel.Name;
             _discourse.AddChatMessage(MessageRole.User, _userMessage, modelName);
@@ -122,7 +122,7 @@ public partial class Chat : ComponentBase, IDisposable
             _userMessage = string.Empty;
             await StopListening();
 
-            if (OllamaHostMode == OllamaHostMode.Aspire)
+            if (HostMode == HostMode.Aspire)
             {
                 await _chatService.StreamChatMessageContentAsync(
                     _discourse, OnStreamCompletion, _cancellationTokenSource.Token);

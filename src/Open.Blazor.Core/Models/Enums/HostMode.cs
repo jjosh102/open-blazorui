@@ -1,6 +1,6 @@
 ﻿namespace Open.Blazor.Core.Models.Enums;
 
-public enum OllamaHostMode
+public enum HostMode
 {
     Local,
     Aspire
