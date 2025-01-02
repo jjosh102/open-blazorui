@@ -81,59 +81,52 @@
 <div id="chat-window" class="overflow-auto mb-2">
     @foreach (var message in _discourse.ChatMessages)
     {
-        <ChatContent Message="message" JsRuntime="_jsRuntime" Toast="_toastComponentService"  Host="OllamaHostMode"/>
+        <ChatContent Message="message" JsRuntime="_jsRuntime" Toast="_toastComponentService" Host="OllamaHostMode" />
     }
 </div>
 
-<div
-    class="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-[#0d1117] p-4 flex items-center gap-3 max-w-3xl w-full">
+<div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 p-4 flex items-center gap-3 max-w-3xl w-full">
     <div class="flex items-center gap-3 w-full">
         <button id="speech-button"
-            class="@(!_isListening ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0"
+            class="@(!_isListening ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0 w-12 h-12 flex items-center justify-center"
             @onclick="@(_isListening ? StopListening : StartListening)">
             @if (!_isListening)
             {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24"
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z
-                             M8 18.5v1a4 4 0 0 0 8 0v-1
-                             M12 3.5v2
-                             M8 6.5s1.5 2 4 2 4-2 4-2" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z M8 18.5v1a4 4 0 0 0 8 0v-1 M12 3.5v2 M8 6.5s1.5 2 4 2 4-2 4-2" />
                 </svg>
             }
             else
             {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24"
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z
-                             M8 18.5v1a4 4 0 0 0 8 0v-1
-                             M4 10.5h16" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z M8 18.5v1a4 4 0 0 0 8 0v-1 M4 10.5h16" />
                 </svg>
             }
         </button>
 
-        <div class="relative flex-grow">
-            <textarea id="chat-input"
-                class="w-full py-2.5 px-3 bg-gray-800 border border-gray-700 rounded-xl text-white resize-none focus:outline-none focus:border-blue-400 transition-colors duration-200"
-                placeholder="Let's chat..." rows="1" @bind="_userMessage"
-                style="min-height: 42px; max-height: 200px; height: auto; overflow-y: hidden;"
-                oninput="adjustChatWindowHeightAndScroll()">
-             </textarea>
-        </div>
+        <textarea id="chat-input"
+            class="flex-grow py-3 px-3 bg-gray-800 border border-gray-700 rounded-xl text-white resize-none focus:outline-none focus:border-blue-400 transition-colors duration-200"
+            placeholder="Let's chat..." rows="1" @bind="_userMessage"
+            style="min-height: 45px; max-height: 200px; height: auto; overflow-y: hidden;"
+            oninput="adjustChatWindowHeightAndScroll()">
+        </textarea>
 
-        <button
-            class="@(!_isChatOngoing ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0"
+        <button class="@(!_isChatOngoing ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0 w-12 h-12 flex items-center justify-center"
             @onclick="@(_isChatOngoing ? StopChat : SendMessage)">
             @if (!_isChatOngoing)
             {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24"
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
             }
             else
             {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24"
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h12v12H6z" />
                 </svg>

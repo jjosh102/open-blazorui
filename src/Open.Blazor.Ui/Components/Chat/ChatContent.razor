@@ -2,8 +2,7 @@
 
 @if (Message is not null)
 {
-    <div
-        class="w-full max-w-[700px] min-w-[400px] mx-auto p-5 box-border flex flex-col @(Message.Role == MessageRole.Assistant ? "items-start" : "items-end")">
+    <div class="max-w-3xl mx-auto p-5 box-border flex flex-col @MessageRoleClass">
         @if (Message.Role == MessageRole.User)
         {
             <div class="flex justify-end">
@@ -15,7 +14,7 @@
         else
         {
             <div class="flex items-center space-x-4 mb-2">
-                <div class="flex items-center justify-center w-10 h-10 @(Host == OllamaHostMode.Local ? "bg-gray-700" : "bg-[#6E50D5]") rounded-full text-white font-bold">
+                <div class="flex items-center justify-center w-10 h-10 @HostBackgroundClass rounded-full text-white font-bold">
                     @Message.Model.Substring(0, 1)
                 </div>
                 <div class="text-gray-400 text-sm">
@@ -27,16 +26,16 @@
             {
                 <div class="flex items-center justify-center">
                     <div class="flex gap-1">
-                        <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce animation-delay-0"></span>
-                        <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce animation-delay-200"></span>
-                        <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce animation-delay-400"></span>
+                        <span class="w-2.5 h-2.5 @HostBackgroundClass rounded-full animate-bounce animation-delay-0"></span>
+                        <span class="w-2.5 h-2.5 @HostBackgroundClass rounded-full animate-bounce animation-delay-200"></span>
+                        <span class="w-2.5 h-2.5 @HostBackgroundClass rounded-full animate-bounce animation-delay-400"></span>
                     </div>
                 </div>
             }
             else
             {
                 <div class="prose prose-sm text-gray-300 max-w-3xl w-full mx-auto">
-                    <div class="p-4 border @(Host == OllamaHostMode.Local ? "border-neutral-600" : "border-violet-600")  rounded-lg bg-[#0d1117] relative" style="padding-bottom: 3rem;">
+                    <div class="p-4 border @HostBorderClass rounded-lg bg-[#0d1117] relative" style="padding-bottom: 3rem;">
                         <div class="overflow-x-auto w-full">
                             <div class="[&>*]:break-words [&>*]:overflow-x-auto
                                         [&>pre]:bg-neutral-900 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:text-neutral-100 [&>pre]:whitespace-pre-wrap
@@ -79,6 +78,10 @@
     [Parameter] public ToastComponent? Toast { get; set; }
     [Parameter] public OllamaHostMode? Host { get; set; }
 
+    private string MessageRoleClass => Message?.Role == MessageRole.Assistant ? "items-start" : "items-end";
+    private string HostBackgroundClass => Host == OllamaHostMode.Local ? "bg-gray-700" : "bg-[#6E50D5]";
+    private string HostBorderClass => Host == OllamaHostMode.Local ? "border-neutral-600" : "border-violet-600";
+
     private async Task CopyToClipboard()
     {
         if (!string.IsNullOrEmpty(Message?.Content))
@@ -101,5 +104,4 @@
             );
         }
     }
-
 }

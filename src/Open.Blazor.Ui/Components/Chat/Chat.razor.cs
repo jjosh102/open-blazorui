@@ -111,7 +111,6 @@ public partial class Chat : ComponentBase, IDisposable
     {
         try
         {
-            Console.WriteLine($"Sending message: {_userMessage}");
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
 
             _isChatOngoing = true;
