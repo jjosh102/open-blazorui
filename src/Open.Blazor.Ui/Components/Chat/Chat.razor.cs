@@ -10,13 +10,13 @@ using Toolbelt.Blazor.SpeechRecognition;
 
 namespace Open.Blazor.Ui.Components.Chat;
 
-public partial class Chat : ComponentBase, IDisposable
+public partial class Chat : ComponentBase, IAsyncDisposable
 {
     private readonly ChatService _chatService;
     private readonly OllamaService _ollamaService;
     private readonly IJSRuntime _jsRuntime;
     private readonly SpeechRecognition _speechRecognition;
-    private readonly ToastService _toastService;   
+    private readonly ToastService _toastService;
 
     private Ollama? _activeOllamaModels;
     private CancellationTokenSource _cancellationTokenSource = new();
@@ -26,7 +26,10 @@ public partial class Chat : ComponentBase, IDisposable
     private bool _isChatOngoing;
     private bool _isListening;
     private bool _isOllamaUp;
-    
+    private HostMode _hostMode = HostMode.Local;
+
+    private IJSObjectReference? _jsModule;
+
 
     //todo support history
     private Kernel _kernel = default!;
@@ -47,7 +50,9 @@ public partial class Chat : ComponentBase, IDisposable
 
     private bool _isPanelOpen;
 
-    [CascadingParameter] public HostMode HostMode { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "selectedHost")]
+    public string SelectedHost { get; set; }
 
     public Chat(ChatService chatService,
         OllamaService ollamaService,
@@ -62,7 +67,14 @@ public partial class Chat : ComponentBase, IDisposable
         _toastService = toastService;
     }
 
-
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrEmpty(SelectedHost) && 
+            Enum.TryParse<HostMode>(SelectedHost, out var parsedMode))
+        {
+            _hostMode = parsedMode;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,7 +83,7 @@ public partial class Chat : ComponentBase, IDisposable
         _speechRecognition.Continuous = true;
         _speechRecognition.Result += OnSpeechRecognized;
 
-        if (HostMode == HostMode.Local)
+        if (_hostMode == HostMode.Local)
         {
             var result = await _ollamaService.GetListOfLocalModelsAsync();
 
@@ -99,6 +111,7 @@ public partial class Chat : ComponentBase, IDisposable
     {
         if (firstRender)
         {
+            _jsModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Chat/Chat.razor.js");
             _isSpeechAvailable = await _speechRecognition.IsAvailableAsync();
             StateHasChanged();
         }
@@ -107,7 +120,6 @@ public partial class Chat : ComponentBase, IDisposable
             await ScrollToBottom();
     }
 
-
     private async Task SendMessage()
     {
         try
@@ -115,7 +127,7 @@ public partial class Chat : ComponentBase, IDisposable
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
 
             _isChatOngoing = true;
-            var modelName = HostMode == HostMode.Aspire
+            var modelName = _hostMode == HostMode.Aspire
                 ? _chatService.GetCurrentModel
                 : _selectedModel.Name;
             _discourse.AddChatMessage(MessageRole.User, _userMessage, modelName);
@@ -123,7 +135,7 @@ public partial class Chat : ComponentBase, IDisposable
             _userMessage = string.Empty;
             await StopListening();
 
-            if (HostMode == HostMode.Aspire)
+            if (_hostMode == HostMode.Aspire)
             {
                 await _chatService.StreamChatMessageContentAsync(
                     _discourse, OnStreamCompletion, _cancellationTokenSource.Token);
@@ -188,7 +200,6 @@ public partial class Chat : ComponentBase, IDisposable
         {
             _selectedModel = selectedModel;
         }
-        if (_selectedModel is null) return;
 
         _kernel = _chatService.CreateKernel(_selectedModel.Name);
     }
@@ -200,7 +211,7 @@ public partial class Chat : ComponentBase, IDisposable
 
     private async Task ScrollToBottom()
     {
-        await _jsRuntime.InvokeVoidAsync("ScrollToBottom", "chat-window");
+        await _jsModule!.InvokeVoidAsync("scrollToBottom", "chat-window");
         await InvokeAsync(StateHasChanged);
     }
 
@@ -224,7 +235,6 @@ public partial class Chat : ComponentBase, IDisposable
         if (_isSpeechAvailable) return true;
         await ShowError("Device not available");
         return false;
-
     }
 
     private async Task StartListening()
@@ -275,9 +285,17 @@ public partial class Chat : ComponentBase, IDisposable
         return $"fixed inset-0 z-50 overflow-hidden {(_isPanelOpen ? "pointer-events-auto" : "pointer-events-none")}";
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         _cancellationTokenSource?.Dispose();
-        _speechRecognition.Result -= OnSpeechRecognized!;
+        _speechRecognition.Result -= OnSpeechRecognized;
+        try
+        {
+            if (_jsModule is not null)
+                await _jsModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
     }
 }

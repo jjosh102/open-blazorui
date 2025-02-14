@@ -1,0 +1,134 @@
+﻿@page "/chat"
+@if (_hostMode == HostMode.Local && _activeOllamaModels is not null)
+{
+<div class="fixed top-4 right-4 z-50">
+    <button @onclick="TogglePanel" class="p-2 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+    </button>
+</div>
+<div class="@GetPanelClasses()">
+    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity @(_isPanelOpen ? "opacity-100" : "opacity-0 pointer-events-none")"
+         @onclick="TogglePanel">
+    </div>
+
+    <div
+        class="fixed top-0 right-0 h-full w-96 transform transition-transform duration-300 ease-in-out @(_isPanelOpen ? "translate-x-0" : "translate-x-full")">
+        <div class="h-full p-6 bg-gray-800 text-white shadow-xl overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-xl font-bold">Chat Settings</div>
+                <button @onclick="TogglePanel" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <hr class="my-4 border-gray-600" />
+
+            <div class="mb-4">
+                <label for="listOfActiveModels" class="block text-sm font-medium text-gray-300">Model</label>
+                <select id="listOfActiveModels"
+                        class="block w-52 p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+                        @onchange="HandleSelectedOptionChanged">
+                    @foreach (var model in _activeOllamaModels.Models)
+                    {
+                    <option value="@model.Name">@model.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="temp-control" class="block text-sm font-medium text-gray-300">Temperature:
+                    @_temperature</label>
+                <input id="temp-control" type="range" min="0" max="2" step="0.1"
+                       class="w-full h-2 bg-gray-600 rounded-lg cursor-pointer accent-blue-500" @bind="_temperature" />
+                <p class="text-xs text-gray-400 mt-1">Think of it as a measure of creativity. Lower values are more
+                    predictable, higher values are more diverse.</p>
+            </div>
+
+            <div class="mb-4">
+                <label for="max-token-control" class="block text-sm font-medium text-gray-300">Max
+                    Tokens: @_maxTokens</label>
+                <input id="max-token-control" type="range" min="0" max="4000" step="10"
+                       class="w-full h-2 bg-gray-600 rounded-lg cursor-pointer accent-blue-500" @bind="_maxTokens" />
+                <p class="text-xs text-gray-400 mt-1">Limits the response length by setting the maximum number of
+                    words or
+                    tokens.</p>
+            </div>
+
+            <div class="mb-4">
+                <label for="system-prompt-control" class="block text-sm font-medium text-gray-300">System
+                    Prompt</label>
+                <textarea id="system-prompt-control" rows="4"
+                          class="block w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+                          @bind="_chatSystemPrompt"></textarea>
+                <p class="text-xs text-gray-400 mt-1">Personalizes responses based on identity or preferences.</p>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<div id="chat-window" class="overflow-auto m-2">
+    @foreach (var message in _discourse.ChatMessages)
+    {
+    <ChatContent Message="message" JsRuntime="_jsRuntime"  Host="_hostMode" />
+    }
+</div>
+
+<div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 p-4 flex items-center gap-3 max-w-3xl w-full">
+    <div class="flex items-center gap-3 w-full">
+        <button id="speech-button"
+                class="@(!_isListening ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0 w-12 h-12 flex items-center justify-center"
+                @onclick="@(_isListening ? StopListening : StartListening)">
+            @if (!_isListening)
+            {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z M8 18.5v1a4 4 0 0 0 8 0v-1 M12 3.5v2 M8 6.5s1.5 2 4 2 4-2 4-2" />
+            </svg>
+            }
+            else
+            {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5v-6a6.5 6.5 0 1 0-13 0v6a6.5 6.5 0 0 0 6.5 6.5Z M8 18.5v1a4 4 0 0 0 8 0v-1 M4 10.5h16" />
+            </svg>
+            }
+        </button>
+
+        <textarea id="chat-input"
+                  class="flex-grow py-3 px-3 bg-gray-800 border border-gray-700 rounded-xl text-white resize-none focus:outline-none focus:border-blue-400 transition-colors duration-200"
+                  placeholder="Let's chat..." rows="1" @bind="_userMessage"
+                  style="min-height: 45px; max-height: 200px; height: auto; overflow-y: hidden;"
+                  oninput="adjustChatWindowHeightAndScroll()">
+        </textarea>
+
+        <button class="@(!_isChatOngoing ? "bg-gray-800 hover:bg-gray-700" : "bg-red-800 hover:bg-red-700") p-2.5 border border-gray-700 rounded-full transition-colors duration-200 flex-shrink-0 w-12 h-12 flex items-center justify-center"
+                @onclick="@(_isChatOngoing ? StopChat : SendMessage)">
+            @if (!_isChatOngoing)
+            {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+            }
+            else
+            {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h12v12H6z" />
+            </svg>
+            }
+        </button>
+    </div>
+</div>

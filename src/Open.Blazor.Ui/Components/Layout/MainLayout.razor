@@ -1,34 +1,18 @@
 ﻿@inherits LayoutComponentBase
-<ToastProvider />
+<ToastProvider/>
 <div class="min-h-screen flex flex-col">
     <header class="bg-[#0d1117] py-4">
-        <div class="max-w-3xl mx-auto px-4 flex justify-between items-center">
-            <div class="text-gray-100 font-semibold">open-blazorui</div>
-            <div class="flex items-center gap-2">
-                <label for="hostModeSelect" class="block text-sm font-medium text-white">Host Mode</label>
-                <select id="hostModeSelect"
-                    class="block w-32 p-2 @HostBackgroundClass border border-gray-600 rounded-md text-white text-sm"
-                    @bind="_hostMode">
-                    @foreach (var mode in Enum.GetValues<HostMode>())
-                    {
-                        <option value="@mode">@mode</option>
-                    }
-                </select>
-            </div>
-        </div>
     </header>
 
     <main class="flex-grow bg-[#0d1117]">
         <div class="max-w-3xl mx-auto p-4">
             <ErrorBoundary>
                 <ChildContent>
-                    <CascadingValue Value="_hostMode" IsFixed="false">
-                        @Body
-                    </CascadingValue>
+                    @Body
                 </ChildContent>
                 <ErrorContent Context="Exception">
                     <div class="bg-gray-800 border border-red-500 text-red-500 px-4 py-3 rounded">
-                        <span class="font-bold">Error Type:</span> @Exception.GetType() <br />
+                        <span class="font-bold">Error Type:</span> @Exception.GetType() <br/>
                         <span class="font-bold">Message:</span> @Exception.Message
                     </div>
                     <p class="text-center text-gray-500 mt-4">Nothing to see here right now. Sorry!</p>
@@ -47,4 +31,5 @@
         _hostMode = newMode;
         StateHasChanged();
     }
+
 }

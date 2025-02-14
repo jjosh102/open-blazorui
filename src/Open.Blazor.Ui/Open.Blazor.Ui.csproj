@@ -25,5 +25,9 @@
       <AdditionalFiles Include="Components\Chat\Chat.razor" />
       <AdditionalFiles Include="Components\Chat\ChatContent.razor" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\js\utilities.js" />
+    </ItemGroup>
 
 </Project>

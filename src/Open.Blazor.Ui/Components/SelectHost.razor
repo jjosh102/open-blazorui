@@ -1,10 +1,9 @@
-﻿@page "/"
-@inject NavigationManager NavigationManager
+﻿@inject NavigationManager NavigationManager
 
-<div class="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
+<div class="min-h-screen bg-[#0D1117] flex flex-col items-center justify-center p-4">
     <div class="max-w-md w-full space-y-8">
         <div class="text-center">
-            <h1 class="text-4xl font-bold text-white mb-2">Welcome to Open-BlazorUI</h1>
+            <h1 class="text-3xl font-bold text-white mb-2">Welcome to Open-BlazorUI</h1>
             <p class="text-gray-400 text-lg">Select your preferred host mode to begin</p>
         </div>
 
@@ -13,7 +12,7 @@
                 <label for="hostModeSelect" class="block text-lg font-medium text-white text-center">
                     Host Mode
                 </label>
-                <select id="hostModeSelect" 
+                <select id="hostModeSelect"
                         class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                         @bind="_selectedMode">
                     @foreach (var mode in Enum.GetValues<HostMode>())
@@ -29,7 +28,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                 </svg>
             </button>
         </div>
@@ -43,9 +42,5 @@
 @code {
     private HostMode _selectedMode = HostMode.Local;
 
-    private void NavigateToChat()
-    {
-        // Navigate to chat page with the selected mode
-        NavigationManager.NavigateTo($"/chat?mode={_selectedMode}");
-    }
+    private void NavigateToChat() => NavigationManager.NavigateTo($"/chat?selectedHost={_selectedMode.ToString()}");
 }
