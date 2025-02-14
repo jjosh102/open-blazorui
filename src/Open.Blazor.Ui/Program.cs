@@ -1,6 +1,7 @@
 
 using Open.Blazor.Core.Extensions;
 using Open.Blazor.Ui.Components;
+using Open.Blazor.Ui.Components.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddCoreDependencies(builder.Configuration);
-
+builder.Services.AddScoped<ToastService>();
 
 var app = builder.Build();
 

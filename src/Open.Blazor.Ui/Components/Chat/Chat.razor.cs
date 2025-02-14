@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Microsoft.SemanticKernel;
 using Open.Blazor.Core.Models;
@@ -17,6 +16,7 @@ public partial class Chat : ComponentBase, IDisposable
     private readonly OllamaService _ollamaService;
     private readonly IJSRuntime _jsRuntime;
     private readonly SpeechRecognition _speechRecognition;
+    private readonly ToastService _toastService;   
 
     private Ollama? _activeOllamaModels;
     private CancellationTokenSource _cancellationTokenSource = new();
@@ -26,8 +26,7 @@ public partial class Chat : ComponentBase, IDisposable
     private bool _isChatOngoing;
     private bool _isListening;
     private bool _isOllamaUp;
-
-    private ToastComponent? _toastComponentService;
+    
 
     //todo support history
     private Kernel _kernel = default!;
@@ -53,12 +52,14 @@ public partial class Chat : ComponentBase, IDisposable
     public Chat(ChatService chatService,
         OllamaService ollamaService,
         IJSRuntime jsRuntime,
-        SpeechRecognition speechRecognition)
+        SpeechRecognition speechRecognition,
+        ToastService toastService)
     {
         _chatService = chatService;
         _ollamaService = ollamaService;
         _jsRuntime = jsRuntime;
         _speechRecognition = speechRecognition;
+        _toastService = toastService;
     }
 
 
@@ -168,7 +169,7 @@ public partial class Chat : ComponentBase, IDisposable
 
     private async Task ShowError(string errorMessage)
     {
-        await _toastComponentService!.ShowToastAsync(
+        await _toastService.ShowToastAsync(
             message: errorMessage,
             type: ToastType.Error,
             title: "Error",
@@ -236,7 +237,7 @@ public partial class Chat : ComponentBase, IDisposable
         {
             _isListening = true;
             await _speechRecognition.StartAsync();
-            await _toastComponentService!.ShowToastAsync(
+            await _toastService.ShowToastAsync(
                 message: "Listening...",
                 type: ToastType.Success,
                 title: "",
@@ -255,7 +256,7 @@ public partial class Chat : ComponentBase, IDisposable
         {
             _isListening = false;
             await _speechRecognition.StopAsync();
-            await _toastComponentService!.ShowToastAsync(
+            await _toastService.ShowToastAsync(
                 message: "Stopped listening...",
                 type: ToastType.Info,
                 title: "",

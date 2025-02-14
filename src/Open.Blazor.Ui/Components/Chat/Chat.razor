@@ -1,6 +1,4 @@
-﻿<ToastComponent @ref="_toastComponentService" />
-
-
+﻿
 @if (HostMode == HostMode.Local && _activeOllamaModels is not null)
 {
     <div class="fixed top-4 right-4 z-50">
@@ -81,7 +79,7 @@
 <div id="chat-window" class="overflow-auto mb-2">
     @foreach (var message in _discourse.ChatMessages)
     {
-        <ChatContent Message="message" JsRuntime="_jsRuntime" Toast="_toastComponentService" Host="HostMode" />
+        <ChatContent Message="message" JsRuntime="_jsRuntime"  Host="HostMode" />
     }
 </div>
 
