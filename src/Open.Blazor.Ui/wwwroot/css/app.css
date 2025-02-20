@@ -55,10 +55,14 @@
     /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
-html,
-body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+::-webkit-scrollbar {
+    display: none;
 }
+
+html {
+    scrollbar-width: none; /* Firefox */
+}
+
 
 h1:focus {
     outline: none;
@@ -110,25 +114,25 @@ h1:focus {
 
 * {
     scrollbar-width: thin; /* For Firefox */
-    scrollbar-color: #6e7681 #15161a; 
+    scrollbar-color: #6e7681 #15161a;
 }
 
 
 *::-webkit-scrollbar {
-    width: 8px; 
-    height: 8px; 
+    width: 8px;
+    height: 8px;
 }
 
 *::-webkit-scrollbar-track {
-    background: #15161a; 
+    background: #15161a;
     border-radius: 4px;
 }
 
 *::-webkit-scrollbar-thumb {
-    background: #6e7681; 
-    border-radius: 4px; 
+    background: #6e7681;
+    border-radius: 4px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-    background: #8b949e; 
+    background: #8b949e;
 }

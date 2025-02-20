@@ -40,7 +40,7 @@
 </div>
 
 @code {
-    private HostMode _selectedMode = HostMode.Local;
+    private HostMode _selectedMode = HostMode.Ollama;
 
     private void NavigateToChat() => NavigationManager.NavigateTo($"/chat?selectedHost={_selectedMode.ToString()}");
 }
