@@ -1,11 +1,8 @@
 ﻿@inherits LayoutComponentBase
 <ToastProvider/>
 <div class="min-h-screen flex flex-col">
-    <header class="bg-[#0d1117] py-4">
-    </header>
-
-    <main class="flex-grow bg-[#0d1117]">
-        <div class="max-w-3xl mx-auto p-4">
+  <main class="flex-grow bg-[#0d1117]">
+        <div class="mx-auto pb-4 ">
             <ErrorBoundary>
                 <ChildContent>
                     @Body
@@ -23,8 +20,8 @@
 </div>
 
 @code {
-    private HostMode _hostMode = HostMode.Local;
-    private string HostBackgroundClass => _hostMode == HostMode.Local ? "bg-gray-700" : "bg-[#6E50D5]";
+    private HostMode _hostMode = HostMode.Ollama;
+    private string HostBackgroundClass => _hostMode == HostMode.Ollama ? "bg-gray-700" : "bg-[#6E50D5]";
 
     private void OnHostModeChanged(HostMode newMode)
     {

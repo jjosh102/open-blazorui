@@ -2,6 +2,6 @@
 
 public enum HostMode
 {
-    Local,
+    Ollama,
     Aspire
 }

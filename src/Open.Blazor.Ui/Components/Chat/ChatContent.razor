@@ -82,8 +82,8 @@
     [Parameter] public HostMode? Host { get; set; }
 
     private string MessageRoleClass => Message?.Role == MessageRole.Assistant ? "items-start" : "items-end";
-    private string HostBackgroundClass => Host == HostMode.Local ? "bg-gray-700" : "bg-[#6E50D5]";
-    private string HostBorderClass => Host == HostMode.Local ? "border-neutral-600" : "border-violet-600";
+    private string HostBackgroundClass => Host == HostMode.Ollama ? "bg-gray-700" : "bg-[#6E50D5]";
+    private string HostBorderClass => Host == HostMode.Ollama ? "border-neutral-600" : "border-violet-600";
 
     private async Task CopyToClipboard()
     {
